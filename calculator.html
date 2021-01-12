@@ -28,7 +28,7 @@
   <body>
     <table border="2" width="700" height="900" align "center">
       <tr>
-        <td colspan="4"><input type="text" id="process" maxlength="24"></td>
+        <td colspan="4"><input type="text" onkeypress="return checkTyping(this)" id="process" maxlength="24"></td>
       </tr>
       <tr>
         <td colspan="4"><input type="text" id="result" disabled></td>
@@ -58,7 +58,7 @@
       <tr>
         <td colspan="2" onclick="add(0)">0</td>
         <td onclick="add('.')" class="function">.</td>
-        <td onclick= "calculation()" class="function">=</td>
+        <td onclick="calculation()" class="function">=</td>
       </tr>
     </table>
     <script>
@@ -83,12 +83,24 @@
         if(isNaN(processDisplay.value.charAt(processDisplay.value.length-1))){
           alert("수식을 다시 확인하세요!");
         } else {
-          resultDisplay.value = eval(processDisplay.value);
+          resultDisplay.value = resultComma(eval(processDisplay.value));
         }
       }
       function resultComma(n){
         return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");
       }
+      function checkTyping() {
+      if(event.key === '.'
+         || event.key === '-'
+         || event.key === '+'
+         || event.key === '/'
+         || event.key === '*'
+         || event.key >= 0 && event.key <= 9) {
+        return true;
+      }
+      return false;
+      }
+
       // function functionRule(char){
       //   var functionKey = document.getElementsByClassName('function');
       //   var display = document.getElementById('process');
