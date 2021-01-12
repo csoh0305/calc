@@ -7,6 +7,7 @@
       td {
         padding : 5px 10px;
         text-align : center;
+        font-size : 35px;
       }
       input {
         width : 100%; height : 100%;
@@ -15,57 +16,91 @@
         font-size : 50px;
       }
       #process{
-        text-align : right
+        text-align : right;
+        color : gray;
+
       }
       #result{
-        text-align : right
+        text-align : right;
       }
     </style>
   </head>
   <body>
     <table border="2" width="700" height="900" align "center">
       <tr>
-        <td colspan="4"><input type="text" id="process" name="process"></td>
+        <td colspan="4"><input type="text" id="process" maxlength="24"></td>
       </tr>
       <tr>
-        <td colspan="4"><input type="text" id="result" name="result"></td>
+        <td colspan="4"><input type="text" id="result" disabled></td>
       </tr>
       <tr>
-        <td colspan="3" onclick="reset(0)">AC</td>
-        <td>/</td>
+        <td colspan="3" onclick="reset()">AC</td>
+        <td onclick="add('/')" class="fucntion">/</td>
       </tr>
       <tr>
-        <td onclick="add(7)">7</td>
-        <td onclick="add(8)">8</td>
-        <td onclick="add(9)">9</td>
-        <td onclick="add(*)">*</td>
+        <td onclick="add('7')">7</td>
+        <td onclick="add('8')">8</td>
+        <td onclick="add('9')">9</td>
+        <td onclick="add('*')" class="function">*</td>
       </tr>
       <tr>
-        <td onclick="add(4)">4</td>
-        <td onclick="add(5)">5</td>
-        <td onclick="add(6)">6</td>
-        <td onclick="add(+)">+</td>
+        <td onclick="add('4')">4</td>
+        <td onclick="add('5')">5</td>
+        <td onclick="add('6')">6</td>
+        <td onclick="add('+')" class="function">+</td>
       </tr>
       <tr>
-        <td onclick="add(1)">1</td>
-        <td onclick="add(2)">2</td>
-        <td onclick="add(3)">3</td>
-        <td onclick="add(-)">-</td>
+        <td onclick="add('1')">1</td>
+        <td onclick="add('2')">2</td>
+        <td onclick="add('3')">3</td>
+        <td onclick="add('-')" class="function">-</td>
       </tr>
       <tr>
         <td colspan="2" onclick="add(0)">0</td>
-        <td onclick="add(.)">.</td>
-        <td>=</td>
+        <td onclick="add('.')" class="function">.</td>
+        <td onclick= "calculation()" class="function">=</td>
       </tr>
     </table>
     <script>
+      var processDisplay = document.getElementById('process');
+      var resultDisplay = document.getElementById('result');
+
       function add(char){
-        var display = document.getElementById('process');
-        display.value += char;
+        if (processDisplay.value.length < 24) {
+          processDisplay.value += char;
+        } else {
+          alert("값을 더 입력할 수 없습니다!");
+        }
       }
-      function reset(num){
-      document.getElementById('process').value = "num";
+      function reset(){
+      var resetConfirm = confirm("정말 초기화 하시겠습니까?");
+      if(resetConfirm === true){
+      document.getElementById('process').value = "";
+      document.getElementById('result').value = "";
+       }
       }
+      function calculation(){
+        if(isNaN(processDisplay.value.charAt(processDisplay.value.length-1))){
+          alert("수식을 다시 확인하세요!");
+        } else {
+          resultDisplay.value = eval(processDisplay.value);
+        }
+      }
+      function resultComma(n){
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");
+      }
+      // function functionRule(char){
+      //   var functionKey = document.getElementsByClassName('function');
+      //   var display = document.getElementById('process');
+      //   for (var i = 0; i < 5; i++) {
+      //     if(functionKey[i] != "char"){
+      //       display.value += char;
+      //     } else {
+      //       alert("값을 더 입력할 수 없습니다!");
+      //     }
+      //   }
+      // }
+
     </script>
   </body>
 </html>

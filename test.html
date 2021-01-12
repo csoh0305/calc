@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <script>
+      var string = "321+51+"
+     document.write(string.charAt(string.length-1)+'<br>');
+     var test = string.charAt(string.length-1);
+
+     document.write(isNaN(test)+'<br>');
+     if (!isNaN(test)) {
+       document.write("fuckyou"+'<br>');
+     }
+     function resultComma(n){
+       return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");
+     }
+     document.write(resultComma("651651651"));
+    </script>
+
+  </body>
+</html>
