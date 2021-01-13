@@ -87,7 +87,12 @@
         }
       }
       function resultComma(n){
-        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");
+        var numberParts = n.toString().split('.');
+        if (numberParts.length > 1) {
+          return numberParts[0].replace(/\B(?=(\d{3})+(?!\d))/g,",") + '.' + numberParts[1];
+        } else {
+          return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");
+        }
       }
       function checkTyping() {
       if(event.key === '.'
