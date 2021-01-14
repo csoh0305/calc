@@ -28,10 +28,10 @@
   <body>
     <table border="2" width="700" height="900" align "center">
       <tr>
-        <td colspan="4"><input type="text" onkeypress="return checkTyping(this)" id="process" maxlength="24"></td>
+        <td colspan="4"><input type="text" onkeypress="checkTyping();" id="process" maxlength="24" value="0"></td>
       </tr>
       <tr>
-        <td colspan="4"><input type="text" id="result" disabled></td>
+        <td colspan="4"><input type="text" id="result" value="0" disabled></td>
       </tr>
       <tr>
         <td colspan="3" onclick="reset()">AC</td>
@@ -56,36 +56,51 @@
         <td onclick="add('-')" class="function">-</td>
       </tr>
       <tr>
-        <td colspan="2" onclick="add(0)">0</td>
-        <td onclick="add('.')" class="function">.</td>
-        <td onclick="calculation()" class="function">=</td>
+        <td colspan="2" onclick="add('0')">0</td>
+        <td onclick="dotAdd('.')">.</td>
+        <td onclick="calculation()">=</td>
       </tr>
     </table>
     <script>
       var processDisplay = document.getElementById('process');
       var resultDisplay = document.getElementById('result');
-
-      function add(char){
-        if (processDisplay.value.length < 24) {
+      var dotChecked = false;
+      function dotAdd(char){
+        if (!dotChecked){
           processDisplay.value += char;
-        } else {
-          alert("값을 더 입력할 수 없습니다!");
+          dotChecked = true;
         }
       }
+      function add(char){
+        var processLastword = processDisplay.value.charAt(processDisplay.value.length-1);
+        if (processDisplay.value.length < 24) {
+            if (processDisplay.value != "0" || char === "." || char === "-" || char === "+" || char === "*" || char === "/") {
+              if (!isNaN(processLastword) || !isNaN(char)) {
+                processDisplay.value += char;
+              } else if(processLastword === "-" || processLastword === "+" || processLastword === "*" || processLastword === "/"){
+                processDisplay.value = processDisplay.value.slice(0, -1);
+                processDisplay.value += char;
+              }
+            } else if(processDisplay.value === "0" ) {
+                processDisplay.value = char;
+           }
+          } else{
+           alert("값을 더 입력할 수 없습니다!");
+         }
+        }
       function reset(){
-      var resetConfirm = confirm("정말 초기화 하시겠습니까?");
-      if(resetConfirm === true){
-      document.getElementById('process').value = "";
-      document.getElementById('result').value = "";
+       processDisplay.value = "0";
+       resultDisplay.value = "0";
+       dotChecked = false;
        }
-      }
       function calculation(){
         if(isNaN(processDisplay.value.charAt(processDisplay.value.length-1))){
           alert("수식을 다시 확인하세요!");
         } else {
           resultDisplay.value = resultComma(eval(processDisplay.value));
+          processDisplay.value = "0";
         }
-      }
+       }
       function resultComma(n){
         var numberParts = n.toString().split('.');
         if (numberParts.length > 1) {
@@ -94,30 +109,15 @@
           return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");
         }
       }
-      function checkTyping() {
-      if(event.key === '.'
-         || event.key === '-'
-         || event.key === '+'
-         || event.key === '/'
-         || event.key === '*'
-         || event.key >= 0 && event.key <= 9) {
-        return true;
+      function checkTyping(obj) {
+       if(event.keyCode === 106 || event.keyCode === 8 || event.keyCode === 46 || event.keyCode === 107
+          || event.keyCode === 109 || event.keyCode === 111 || event.keyCode === 110 || event.keyCode >= 37 && event.keyCode <= 40
+          || event.keyCode >= 48 && event.keyCode <= 57 || event.keyCode >= 96 && event.keyCode <= 105){
+         event.returnValue = true;
+       } else {
+         event.returnValue = false;
+       }
       }
-      return false;
-      }
-
-      // function functionRule(char){
-      //   var functionKey = document.getElementsByClassName('function');
-      //   var display = document.getElementById('process');
-      //   for (var i = 0; i < 5; i++) {
-      //     if(functionKey[i] != "char"){
-      //       display.value += char;
-      //     } else {
-      //       alert("값을 더 입력할 수 없습니다!");
-      //     }
-      //   }
-      // }
-
     </script>
   </body>
 </html>
