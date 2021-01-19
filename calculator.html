@@ -28,7 +28,7 @@
   <body>
     <table border="2" width="700" height="900" align "center">
       <tr>
-        <td colspan="4"><input type="text" onkeypress="checkTyping();" id="process" maxlength="24" value="0"></td>
+        <td colspan="4"><input type="text" style="ime-mode: disabled" onkeydown="checkTyping(event);" id="process" maxlength="24" value="0"></td>
       </tr>
       <tr>
         <td colspan="4"><input type="text" id="result" value="0" disabled></td>
@@ -58,13 +58,19 @@
       <tr>
         <td colspan="2" onclick="add('0')">0</td>
         <td onclick="dotAdd('.')">.</td>
-        <td onclick="calculation()">=</td>
+        <td id="calculation">=</td>
       </tr>
     </table>
     <script>
       var processDisplay = document.getElementById('process');
       var resultDisplay = document.getElementById('result');
+      var calculateButton = document.getElementById('calculation');
       var dotChecked = false;
+      var checkFinish = false;
+      var lastOperator;
+      var lastArrNum = 0;
+      var lastResult;
+
       function dotAdd(char){
         if (!dotChecked){
           processDisplay.value += char;
@@ -74,16 +80,22 @@
       function add(char){
         var processLastword = processDisplay.value.charAt(processDisplay.value.length-1);
         if (processDisplay.value.length < 24) {
+          if(!checkFinish){
             if (processDisplay.value != "0" || char === "." || char === "-" || char === "+" || char === "*" || char === "/") {
               if (!isNaN(processLastword) || !isNaN(char)) {
                 processDisplay.value += char;
               } else if(processLastword === "-" || processLastword === "+" || processLastword === "*" || processLastword === "/"){
                 processDisplay.value = processDisplay.value.slice(0, -1);
                 processDisplay.value += char;
+                console.log(processLastword);
               }
-            } else if(processDisplay.value === "0" ) {
+            } else if(processDisplay.value === "0") {
                 processDisplay.value = char;
+           } } else if (checkFinish) {
+             processDisplay.value = char;
+             checkFinish = false;
            }
+
           } else{
            alert("값을 더 입력할 수 없습니다!");
          }
@@ -92,15 +104,77 @@
        processDisplay.value = "0";
        resultDisplay.value = "0";
        dotChecked = false;
+       checkFinish = false;
        }
-      function calculation(){
-        if(isNaN(processDisplay.value.charAt(processDisplay.value.length-1))){
-          alert("수식을 다시 확인하세요!");
-        } else {
-          resultDisplay.value = resultComma(eval(processDisplay.value));
-          processDisplay.value = "0";
+      // function calculation(){
+      //   if(isNaN(processDisplay.value.charAt(processDisplay.value.length-1))){
+      //     alert("수식을 다시 확인하세요!");
+      //   } else {
+      //     resultDisplay.value = resultComma(eval(processDisplay.value));
+      //     processDisplay.value = "0";
+      //   }
+      //  }
+      function arrangement(char){
+        var calArr = [];
+        var current = '';
+        for(var i = 0, ch; ch = char.charAt(i); i++){
+          if('*/+-'.indexOf(ch) > -1){
+            if (current === '' && ch === '-') {
+              current = '-';
+            } else {
+                calArr.push(parseFloat(current), ch);
+                current = '';
+              }
+          } else {
+              current += char.charAt(i);
+          }
+        }
+          if (current != ''){
+            calArr.push(parseFloat(current));
+          }
+          return calArr;
+        }
+      function calculation(calc){
+        var processLastword = processDisplay.value.charAt(processDisplay.value.length-1);
+        var operation = [{'*': (a, b) => a * b, '/': (a, b) => a / b},
+              {'+': (a, b) => a + b, '-': (a, b) => a - b}];
+        var newCalc = [];
+        var currentOperator;
+
+        if(isNaN(processLastword)){
+           alert("수식을 다시 확인하세요!");
+         } else if(checkFinish){
+           calc[0] = lastOperator(parseFloat(resultDisplay.value.replaceAll(',','')), lastArrNum);
+           return calc[0];
+         } else if(!checkFinish){
+            for (var i = 0; i < operation.length; i++) {
+            for (var j = 0; j < calc.length; j++) {
+            if (operation[i][calc[j]]) {
+              currentOperator = operation[i][calc[j]];
+            } else if (currentOperator) {
+                newCalc[newCalc.length - 1] = currentOperator(newCalc[newCalc.length - 1], calc[j]);
+                lastOperator = currentOperator;
+                lastArrNum = calc[j];
+                console.log(lastArrNum);
+                currentOperator = null;
+              } else {
+                  newCalc.push(calc[j]);
+              }
+           }
+           calc = newCalc;
+           newCalc = [];
+           console.log(calc[0]);
+          }
+          lastResult = calc[0];
+          return calc[0];
         }
        }
+      calculateButton.addEventListener('click', function(){
+        resultDisplay.value = resultComma(calculation(arrangement(processDisplay.value)));
+        checkFinish = true;
+        console.log(checkFinish);
+      });
+
       function resultComma(n){
         var numberParts = n.toString().split('.');
         if (numberParts.length > 1) {
@@ -109,14 +183,16 @@
           return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");
         }
       }
-      function checkTyping(obj) {
+      function checkTyping(event) {
        if(event.keyCode === 106 || event.keyCode === 8 || event.keyCode === 46 || event.keyCode === 107
-          || event.keyCode === 109 || event.keyCode === 111 || event.keyCode === 110 || event.keyCode >= 37 && event.keyCode <= 40
-          || event.keyCode >= 48 && event.keyCode <= 57 || event.keyCode >= 96 && event.keyCode <= 105){
-         event.returnValue = true;
-       } else {
-         event.returnValue = false;
-       }
+          || event.keyCode === 109 || event.keyCode === 111 || event.keyCode === 110){
+          return; }
+       if(event.keyCode >= 37 && event.keyCode <= 40) {
+          return; }
+       if(event.keyCode >= 96 && event.keyCode <= 105) {
+         return; }
+
+       event.preventDefault();
       }
     </script>
   </body>
